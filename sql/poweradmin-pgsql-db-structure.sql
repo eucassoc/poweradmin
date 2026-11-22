@@ -669,3 +669,21 @@ CREATE INDEX "idx_zone_change_requests_zone_id" ON "public"."zone_change_request
 CREATE INDEX "idx_zone_change_requests_status" ON "public"."zone_change_requests" USING btree ("status");
 CREATE INDEX "idx_zone_change_requests_requester_id" ON "public"."zone_change_requests" USING btree ("requester_id");
 CREATE INDEX "idx_zone_change_requests_created_at" ON "public"."zone_change_requests" USING btree ("created_at");
+
+
+-- The optional tamper-evident chain over the log tables (logging.integrity_chain)
+CREATE TABLE "public"."log_integrity_chain" (
+                                       "seq" bigint NOT NULL,
+                                       "line" text NOT NULL,
+                                       CONSTRAINT "log_integrity_chain_pkey" PRIMARY KEY ("seq")
+);
+
+CREATE SEQUENCE log_integrity_checkpoints_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."log_integrity_checkpoints" (
+                                       "id" integer DEFAULT nextval('log_integrity_checkpoints_id_seq') NOT NULL,
+                                       "size" bigint NOT NULL,
+                                       "note" text NOT NULL,
+                                       "created_at" timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                       CONSTRAINT "log_integrity_checkpoints_pkey" PRIMARY KEY ("id")
+);

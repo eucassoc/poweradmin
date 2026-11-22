@@ -25,6 +25,11 @@ namespace Poweradmin\Application\Console;
 use Closure;
 use InvalidArgumentException;
 use Poweradmin\Application\Console\Command\ApiKeyCreateCommand;
+use Poweradmin\Application\Console\Command\LogAnonymizeUserCommand;
+use Poweradmin\Application\Console\Command\LogChainExportCommand;
+use Poweradmin\Application\Console\Command\LogCheckpointImportCommand;
+use Poweradmin\Application\Console\Command\LogPruneCommand;
+use Poweradmin\Application\Console\Command\LogVerifyCommand;
 use Poweradmin\Application\Console\Command\ZoneListCommand;
 use Poweradmin\Application\Console\Command\ZoneShowCommand;
 use Poweradmin\Application\Service\ControllerServiceFactory;
@@ -68,6 +73,22 @@ final class CommandRegistry
             ApiKeyCreateCommand::class => static fn(ControllerServiceFactory $services): CommandInterface => new ApiKeyCreateCommand(
                 $services->apiKeyService(),
                 $services->auditService()
+            ),
+            LogVerifyCommand::class => static fn(ControllerServiceFactory $services): CommandInterface => new LogVerifyCommand(
+                $services->integrityVerifier(),
+                $services->configuration()
+            ),
+            LogChainExportCommand::class => static fn(ControllerServiceFactory $services): CommandInterface => new LogChainExportCommand(
+                $services->integrityVerifier()
+            ),
+            LogCheckpointImportCommand::class => static fn(ControllerServiceFactory $services): CommandInterface => new LogCheckpointImportCommand(
+                $services->database()
+            ),
+            LogPruneCommand::class => static fn(ControllerServiceFactory $services): CommandInterface => new LogPruneCommand(
+                $services->logMaintenance()
+            ),
+            LogAnonymizeUserCommand::class => static fn(ControllerServiceFactory $services): CommandInterface => new LogAnonymizeUserCommand(
+                $services->logMaintenance()
             ),
         ]);
     }

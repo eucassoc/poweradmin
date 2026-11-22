@@ -24,6 +24,7 @@ namespace Poweradmin\Infrastructure\Logger;
 
 use InvalidArgumentException;
 use PDO;
+use Poweradmin\Infrastructure\Logger\Integrity\IntegrityChain;
 use Poweradmin\Infrastructure\Utility\IpAddressRetriever;
 use Poweradmin\Domain\Port\ActorInterface;
 use Poweradmin\Domain\Port\RecordChangeWriterInterface;
@@ -280,6 +281,7 @@ class RecordChangeLogger implements RecordChangeWriterInterface
         $stmt->bindValue(':after_state', $afterState, $afterState === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         $stmt->bindValue(':client_ip', $this->getClientIp(), PDO::PARAM_STR);
         $stmt->execute();
+        IntegrityChain::afterInsert($this->db, 'log_record_changes');
     }
 
     /**
@@ -314,6 +316,7 @@ class RecordChangeLogger implements RecordChangeWriterInterface
         $stmt->execute();
 
         self::$changesetId = (int) $this->db->lastInsertId('log_changesets_id_seq');
+        IntegrityChain::afterInsert($this->db, 'log_changesets');
 
         return self::$changesetId;
     }

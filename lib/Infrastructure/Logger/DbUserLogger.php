@@ -23,6 +23,7 @@
 namespace Poweradmin\Infrastructure\Logger;
 
 use PDO;
+use Poweradmin\Infrastructure\Logger\Integrity\IntegrityChain;
 use Poweradmin\Domain\Database\DbCompat;
 
 /**
@@ -44,6 +45,7 @@ class DbUserLogger
             ':msg' => LogEventColumn::fit($msg),
             ':priority' => $priority,
         ]);
+        IntegrityChain::afterInsert($this->db, 'log_users');
     }
 
     public function getDistinctEventTypes(): array

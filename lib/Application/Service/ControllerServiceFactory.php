@@ -132,6 +132,9 @@ use Poweradmin\Infrastructure\Api\PowerdnsApiClient;
 use Poweradmin\Domain\Config\ConfigurationInterface;
 use Poweradmin\Infrastructure\Logger\AuditLogWriter;
 use Poweradmin\Infrastructure\Logger\DbApiLogger;
+use Poweradmin\Infrastructure\Logger\Integrity\IntegrityChain;
+use Poweradmin\Infrastructure\Logger\Integrity\IntegrityVerifier;
+use Poweradmin\Infrastructure\Logger\Integrity\LogMaintenance;
 use Poweradmin\Infrastructure\Logger\DbGroupLogger;
 use Poweradmin\Infrastructure\Logger\DbUserLogger;
 use Poweradmin\Infrastructure\Logger\DbZoneLogger;
@@ -165,11 +168,16 @@ class ControllerServiceFactory implements ModuleServices
     private ?ProxyContextInterface $proxyContext = null;
     private ?CsvFormulaEscaper $csvFormulaEscaper = null;
 
+    private PDO $db;
+    private ConfigurationInterface $config;
+
     /**
      * @param ActorInterface $actor Who the request acts as; an API controller rebinds it via bindActor()
      */
     public function __construct(PDO $db, ConfigurationInterface $config, LoggerInterface $logger, ActorInterface $actor, SessionInterface $session)
     {
+        $this->db = $db;
+        $this->config = $config;
         $this->session = $session;
         $this->actor = new RequestActor($actor);
         $this->backend = new BackendServices($db, $config, $logger, $this->actor, $session);
@@ -483,6 +491,32 @@ class ControllerServiceFactory implements ModuleServices
     public function auditService(): AuditService
     {
         return $this->auth->auditService();
+    }
+
+    /** The connection, for console commands that work on the log tables themselves */
+    public function database(): PDO
+    {
+        return $this->db;
+    }
+
+    public function configuration(): ConfigurationInterface
+    {
+        return $this->config;
+    }
+
+    public function integrityChain(): IntegrityChain
+    {
+        return new IntegrityChain($this->db, $this->config);
+    }
+
+    public function integrityVerifier(): IntegrityVerifier
+    {
+        return new IntegrityVerifier($this->db, $this->integrityChain());
+    }
+
+    public function logMaintenance(): LogMaintenance
+    {
+        return new LogMaintenance($this->db, $this->integrityChain());
     }
 
     public function auditLogWriter(): AuditLogWriter

@@ -23,6 +23,7 @@
 namespace Poweradmin\Infrastructure\Logger;
 
 use PDO;
+use Poweradmin\Infrastructure\Logger\Integrity\IntegrityChain;
 use Poweradmin\Domain\Port\BackendCapabilitiesInterface;
 use Poweradmin\Domain\Config\ConfigurationInterface;
 use Poweradmin\Domain\Database\DbCompat;
@@ -54,6 +55,7 @@ class DbZoneLogger
             ':zone_id' => $zone_id,
             ':priority' => $priority,
         ]);
+        IntegrityChain::afterInsert($this->db, 'log_zones');
     }
 
     public function getDistinctOperations(): array

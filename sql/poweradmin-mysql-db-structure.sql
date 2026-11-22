@@ -598,3 +598,19 @@ CREATE TABLE `zone_change_requests` (
     KEY `idx_zone_change_requests_requester_id` (`requester_id`),
     KEY `idx_zone_change_requests_created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- The optional tamper-evident chain over the log tables (logging.integrity_chain)
+CREATE TABLE `log_integrity_chain` (
+                              `seq` bigint NOT NULL,
+                              `line` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+                              PRIMARY KEY (`seq`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `log_integrity_checkpoints` (
+                              `id` int(11) NOT NULL AUTO_INCREMENT,
+                              `size` bigint NOT NULL,
+                              `note` text NOT NULL,
+                              `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                              PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

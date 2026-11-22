@@ -515,3 +515,9 @@ CREATE INDEX idx_zone_change_requests_zone_id ON zone_change_requests(zone_id);
 CREATE INDEX idx_zone_change_requests_status ON zone_change_requests(status);
 CREATE INDEX idx_zone_change_requests_requester_id ON zone_change_requests(requester_id);
 CREATE INDEX idx_zone_change_requests_created_at ON zone_change_requests(created_at);
+
+
+-- The optional tamper-evident chain over the log tables (logging.integrity_chain)
+CREATE TABLE log_integrity_chain (seq integer PRIMARY KEY, line TEXT NOT NULL);
+
+CREATE TABLE log_integrity_checkpoints (id integer PRIMARY KEY, size integer NOT NULL, note TEXT NOT NULL, created_at timestamp DEFAULT current_timestamp NOT NULL);

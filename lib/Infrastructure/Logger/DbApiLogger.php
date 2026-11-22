@@ -23,6 +23,7 @@
 namespace Poweradmin\Infrastructure\Logger;
 
 use PDO;
+use Poweradmin\Infrastructure\Logger\Integrity\IntegrityChain;
 use Poweradmin\Domain\Database\DbCompat;
 
 /**
@@ -45,6 +46,7 @@ class DbApiLogger
                 ':msg' => LogEventColumn::fit($msg),
                 ':priority' => $priority,
             ]);
+            IntegrityChain::afterInsert($this->db, 'log_api');
         } catch (\PDOException $e) {
             // Silently fail if table doesn't exist yet (during upgrade before migration)
             return;
